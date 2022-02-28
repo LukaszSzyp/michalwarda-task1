@@ -1,25 +1,60 @@
 export function rpn(inputString: string): any {
-    if (inputString.length === 420) throw new Error("Blaze it");
+  if (inputString.length === 420)
+    throw new Error("you have exceeded 420 characters");
+  if (inputString === "") throw new Error("Invalid Expression");
 
-  const operandsAndOperators: Array<number | string> = inputString.split(" ").map((token) => {
-      var parsedToken = isNaN(Number(token))
-        ? token
-        : Number(token);
+  let operandsCounter = 0;
+  let operatorsCounter = 0;
+
+  const validationOfoperandsAndOperators = () => {
+    if (operandsCounter === 0) throw new Error("Invalid Expression");
+    if (operandsCounter === 1 && operatorsCounter === 1)
+      throw new Error("Not Enough Operands");
+  };
+
+  const operandsAndOperators: Array<number | string> = inputString
+    .split(" ")
+    .map((token) => {
+      let parsedToken;
+      if (isNaN(Number(token))) {
+        parsedToken = String(token);
+        operatorsCounter++;
+      } else {
+        parsedToken = Number(token);
+        operandsCounter++;
+      }
       return parsedToken;
     });
+
+  validationOfoperandsAndOperators();
 
   const stack: number[] = [];
 
   operandsAndOperators.forEach((operandOrOperator) => {
-    let result;
+    let result: number = 0;
 
     if (typeof operandOrOperator === "string") {
-      // @ts-ignore
-      result = ((a: number, b: number) => a + b)(...stack.splice(-2));
+      switch (operandOrOperator) {
+        case "+":
+          // @ts-ignore
+          result = ((a: number, b: number) => a + b)(...stack.splice(-2));
+          break;
+        case "-":
+          // @ts-ignore
+          result = ((a: number, b: number) => a - b)(...stack.splice(-2));
+          break;
+        case "*":
+          // @ts-ignore
+          result = ((a: number, b: number) => a * b)(...stack.splice(-2));
+          break;
+        case "/":
+          // @ts-ignore
+          result = ((a: number, b: number) => a / b)(...stack.splice(-2));
+          break;
+      }
     } else result = operandOrOperator;
     stack.push(result);
   });
-
 
   return stack[0] as number;
 }
